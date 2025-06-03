@@ -1,8 +1,8 @@
 use crate::piece::*;
 pub struct Board {
-    pieces: Vec<Piece>,
-    tiles: Vec<u8>,
-    state: bool
+    pub pieces: Vec<Piece>,
+    pub tiles: Vec<u8>,
+    pub state: bool
 }
 
 impl Board {
