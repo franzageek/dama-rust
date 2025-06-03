@@ -23,12 +23,12 @@ impl Piece {
         for i in 0u8..24u8 {
             vec.push(
                 Piece { 
-                    n: i + if i > 11{
-                        9
-                    } else {
+                    n: i + if i < 11{
                         1
+                    } else {
+                        9
                     }, 
-                    player: if i > 11{
+                    player: if i < 11{
                         true
                     } else {
                         false
