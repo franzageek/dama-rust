@@ -18,6 +18,13 @@ enum Pos {
     TopLeft = 4
 }
 
+#[allow(dead_code)]
+pub enum TileState {
+    Free(u8),
+    Busy(u8),
+    OutOfRange
+}
+
 impl Piece {
     pub fn init() -> Vec<Piece> {
         print!("initializing pieces...");
@@ -45,14 +52,15 @@ impl Piece {
     }
 }
 
-fn get_next(pos: Pos, n: u8) -> u8 {
+fn get_next(pos: Pos, n: u8, tiles: &Vec<u8>) -> TileState {
     let (_, y): (u8, u8) =  coord::xy_from_n(n);
+    let next: u8;
     match pos {
         Pos::None => { 
-            return 0; 
+            next = 0; 
         }
         Pos::BottomLeft => {
-            return if n != 1 && n != 9 && n != 17 && n != 25 {
+            next = if n != 1 && n != 9 && n != 17 && n != 25 {
                 n + if y % 2 == 0 { 
                     3 
                 } else {
@@ -63,7 +71,7 @@ fn get_next(pos: Pos, n: u8) -> u8 {
             };
         }
         Pos::BottomRight => {
-            return if n != 8 && n != 16 && n != 24 && n != 32 {
+            next =  if n != 8 && n != 16 && n != 24 && n != 32 {
                 n + if y % 2 == 0 {
                     4
                 } else {
@@ -74,7 +82,7 @@ fn get_next(pos: Pos, n: u8) -> u8 {
             };
         }
         Pos::TopRight => {
-            return if n != 8 && n != 16 && n != 24 && n != 32 {
+            next = if n != 8 && n != 16 && n != 24 && n != 32 {
                 n - if y % 2 == 0 { 
                     4 
                 } else {
@@ -85,7 +93,7 @@ fn get_next(pos: Pos, n: u8) -> u8 {
             };
         }
         Pos::TopLeft => {
-            return if n != 1 && n != 9 && n != 17 && n != 25 {
+            next = if n != 1 && n != 9 && n != 17 && n != 25 {
                 n - if y % 2 == 0 { 
                     5
                 } else {
@@ -96,50 +104,79 @@ fn get_next(pos: Pos, n: u8) -> u8 {
             };
         }
     }
-}
-
-fn check_next(next: u8, tiles: &Vec<u8>) -> bool {
-    return next > 0 && next < 32 && tiles[(next-1) as usize] == 0;
+    if next > 0 && next < 32 {
+        if tiles[(next-1) as usize] == 0 {
+            return TileState::Free(next);
+        } else {
+            return TileState::Busy(next);
+        }
+    } else {
+        return TileState::OutOfRange;
+    }
 }
 
 pub fn possible_moves(piece: &Piece, tiles: &Vec<u8>) -> Option<Vec<u8>> {
     let mut vec = Vec::new();
     if !piece.king {
         if piece.player {
-            let mut next: u8 = get_next(Pos::BottomLeft, piece.n);
-            if check_next(next, tiles) {
-                vec.push(next);
-            } 
-            next = get_next(Pos::BottomRight, piece.n);
-            if check_next(next, tiles) {
-                vec.push(next);
-            } 
+            let mut next: TileState = get_next(Pos::BottomLeft, piece.n, tiles);
+            match next {
+                TileState::Free(n) => {
+                    vec.push(n);
+                }
+                _ => {}
+            }
+            next = get_next(Pos::BottomRight, piece.n, tiles);
+            match next {
+                TileState::Free(n) => {
+                    vec.push(n);
+                }
+                _ => {}
+            }
         } else {
-            let mut next: u8 = get_next(Pos::TopRight, piece.n);
-            if check_next(next, tiles) {
-                vec.push(next);
-            } 
-            next = get_next(Pos::TopLeft, piece.n);
-            if check_next(next, tiles) {
-                vec.push(next);
+            let mut next: TileState = get_next(Pos::TopRight, piece.n, tiles);
+            match next {
+                TileState::Free(n) => {
+                    vec.push(n);
+                }
+                _ => {}
+            }
+            next = get_next(Pos::TopLeft, piece.n, tiles);
+            match next {
+                TileState::Free(n) => {
+                    vec.push(n);
+                }
+                _ => {}
             } 
         }
     } else {
-        let mut next: u8 = get_next(Pos::BottomLeft, piece.n);
-        if check_next(next, tiles) {
-            vec.push(next);
+        let mut next: TileState = get_next(Pos::BottomLeft, piece.n, tiles);
+        match next {
+            TileState::Free(n) => {
+                vec.push(n);
+            }
+            _ => {}
+        }
+        next = get_next(Pos::BottomRight, piece.n, tiles);
+        match next {
+            TileState::Free(n) => {
+                vec.push(n);
+            }
+            _ => {}
         } 
-        next = get_next(Pos::BottomRight, piece.n);
-        if check_next(next, tiles) {
-            vec.push(next);
+        next = get_next(Pos::TopRight, piece.n, tiles);
+        match next {
+            TileState::Free(n) => {
+                vec.push(n);
+            }
+            _ => {}
         } 
-        let mut next: u8 = get_next(Pos::TopRight, piece.n);
-        if check_next(next, tiles) {
-            vec.push(next);
-        } 
-        next = get_next(Pos::TopLeft, piece.n);
-        if check_next(next, tiles) {
-            vec.push(next);
+        next = get_next(Pos::TopLeft, piece.n, tiles);
+        match next {
+            TileState::Free(n) => {
+                vec.push(n);
+            }
+            _ => {}
         } 
     }
     return if vec.len() > 0 {
@@ -155,4 +192,12 @@ pub fn move_to(piece: &mut Piece, n: u8, board: &mut Board) {
     board.tiles[(piece.n-1) as usize] = 0;
     piece.n = n;
     return;
+}
+
+pub fn from_n(n: u8, board: &mut Board) -> Option<&mut Piece> {
+    return if n > 0 && n <= 32 {
+        Some(&mut board.pieces[(board.tiles[(n-1) as usize]-1) as usize])
+    } else {
+        None
+    };
 }
