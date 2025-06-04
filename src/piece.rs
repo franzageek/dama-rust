@@ -119,30 +119,26 @@ pub fn possible_moves(piece: &Piece, tiles: &Vec<u8>) -> Option<Vec<u8>> {
     let mut vec = Vec::new();
     if !piece.king {
         if piece.player {
-            let mut next: TileState = get_next(Pos::BottomLeft, piece.n, tiles);
-            match next {
+            match get_next(Pos::BottomLeft, piece.n, tiles) {
                 TileState::Free(n) => {
                     vec.push(n);
                 }
                 _ => {}
             }
-            next = get_next(Pos::BottomRight, piece.n, tiles);
-            match next {
+            match get_next(Pos::BottomRight, piece.n, tiles) {
                 TileState::Free(n) => {
                     vec.push(n);
                 }
                 _ => {}
             }
         } else {
-            let mut next: TileState = get_next(Pos::TopRight, piece.n, tiles);
-            match next {
+            match get_next(Pos::TopRight, piece.n, tiles) {
                 TileState::Free(n) => {
                     vec.push(n);
                 }
                 _ => {}
             }
-            next = get_next(Pos::TopLeft, piece.n, tiles);
-            match next {
+            match get_next(Pos::TopLeft, piece.n, tiles) {
                 TileState::Free(n) => {
                     vec.push(n);
                 }
@@ -150,29 +146,25 @@ pub fn possible_moves(piece: &Piece, tiles: &Vec<u8>) -> Option<Vec<u8>> {
             } 
         }
     } else {
-        let mut next: TileState = get_next(Pos::BottomLeft, piece.n, tiles);
-        match next {
+        match get_next(Pos::BottomLeft, piece.n, tiles) {
             TileState::Free(n) => {
                 vec.push(n);
             }
             _ => {}
         }
-        next = get_next(Pos::BottomRight, piece.n, tiles);
-        match next {
+        match get_next(Pos::BottomRight, piece.n, tiles) {
             TileState::Free(n) => {
                 vec.push(n);
             }
             _ => {}
         } 
-        next = get_next(Pos::TopRight, piece.n, tiles);
-        match next {
+        match get_next(Pos::TopRight, piece.n, tiles) {
             TileState::Free(n) => {
                 vec.push(n);
             }
             _ => {}
         } 
-        next = get_next(Pos::TopLeft, piece.n, tiles);
-        match next {
+        match get_next(Pos::TopLeft, piece.n, tiles) {
             TileState::Free(n) => {
                 vec.push(n);
             }
