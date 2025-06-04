@@ -13,7 +13,9 @@ fn main() {
                 println!("possible move: {i}");
             }
         }
-        _ => {}
+        _ => { 
+            println!("no move avaliable");
+        }
     }
     println!("Thanks for playing dama ;)");
 }
