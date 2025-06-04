@@ -1,4 +1,5 @@
 use crate::coord;
+use crate::board::*;
 
 #[derive(Clone)]
 pub struct Piece {
@@ -145,4 +146,12 @@ pub fn possible_moves(piece: &Piece, tiles: &Vec<u8>) -> Option<Vec<u8>> {
     } else {
         None
     };
+}
+
+pub fn move_to(piece: &mut Piece, n: u8, board: &mut Board) {
+    let index: u8 = board.tiles[(piece.n-1) as usize];
+    board.tiles[(n-1) as usize] = index;
+    board.tiles[(piece.n-1) as usize] = 0;
+    piece.n = n;
+    return;
 }
