@@ -1,4 +1,6 @@
 use crate::piece::*;
+
+#[allow(dead_code)]
 pub struct Board {
     pub pieces: Vec<Piece>,
     pub tiles: Vec<u8>,

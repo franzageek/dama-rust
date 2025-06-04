@@ -1,6 +1,6 @@
 use crate::coord;
 use crate::board::*;
-
+#[allow(dead_code)]
 #[derive(Clone)]
 pub struct Piece {
     pub n: u8,
@@ -9,6 +9,7 @@ pub struct Piece {
     pub valid: bool
 }
 
+#[allow(dead_code)]
 enum Pos {
     None = 0,
     BottomLeft = 1,
