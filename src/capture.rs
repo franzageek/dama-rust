@@ -1,6 +1,6 @@
 use crate::{board, piece, tiles::{self, TileState}};
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 #[allow(dead_code)]
 pub struct Capture {
     pub ndest: u8,
@@ -13,28 +13,30 @@ fn get_capture(piece: &piece::Piece, board: &mut board::Board, auxn: Option<u8>,
     if ivec.len() > 0 {
         vec = ivec.clone();
     }
-    match auxn {
-        Some(aux_n) => {
-            match tiles::get_next(pos, aux_n, &board.tiles) {
-                tiles::TileState::Busy(n0) => {
-                    if let Some(piece0) = piece::from_n(n0, board) {
-                        if piece0.king == piece.king || (piece.king && !piece0.king) {
-                            match tiles::get_next(pos, n0, &board.tiles) {
-                                TileState::Free(n1) => {
-                                    vec.push(
-                                        Capture { 
-                                            ndest: n1, 
-                                            ncapture: n0, 
-                                            next: Vec::with_capacity(0)
-                                        }
-                                    );
+    match tiles::get_next(
+        pos, 
+        match auxn {
+            Some(aux_n) => { aux_n }
+            _ => { piece.n }
+        }, 
+        &board.tiles
+    ) {
+        tiles::TileState::Busy(n0) => {
+            if let Some(piece0) = piece::from_n(n0, board) {
+                if piece0.king == piece.king || (piece.king && !piece0.king) {
+                    match tiles::get_next(pos, n0, &board.tiles) {
+                        TileState::Free(n1) => {
+                            vec.push(
+                                Capture { 
+                                    ndest: n1, 
+                                    ncapture: n0, 
+                                    next: get_possible(piece, board, n1, pos)
                                 }
-                                _ => {}
-                            }
+                            );
                         }
+                        _ => {}
                     }
                 }
-                _ => {}
             }
         }
         _ => {}
@@ -48,26 +50,50 @@ pub fn get_possible(piece: &piece::Piece, board: &mut board::Board, auxn: u8, la
         for i in 1u8..=4u8 {
             if last_move as u8 > 0 {
                 if i != ((last_move as u8 + 1) % 4) + 1 {
-                    vec = get_capture(piece, board, if auxn < 1 && auxn < 32 {
+                    vec = get_capture(piece, board, if auxn > 1 && auxn < 32 {
                         Some(auxn)
                     } else {
                         None
                     }, 
-                    i, vec); //fix cast
+                    tiles::Pos::from(i), vec); //fix cast
                 }
             }
             else {
-                vec = get_capture(piece, board, if auxn < 1 && auxn < 32 {
+                vec = get_capture(piece, board, if auxn > 1 && auxn < 32 {
                     Some(auxn)
                 } else {
                     None
                 }, 
-                last_move, vec);
+                tiles::Pos::from(i), vec);
             }
         }
     } else {
         if piece.player {
-            vec = get_capture(piece, board, auxn, pos, ivec)
+            vec = get_capture(piece, board, if auxn > 1 && auxn < 32 {
+                Some(auxn)
+            } else {
+                None
+            }, 
+            tiles::Pos::BottomLeft, vec);
+            vec = get_capture(piece, board, if auxn > 1 && auxn < 32 {
+                Some(auxn)
+            } else {
+                None
+            }, 
+            tiles::Pos::BottomRight, vec);
+        } else {
+            vec = get_capture(piece, board, if auxn > 1 && auxn < 32 {
+                Some(auxn)
+            } else {
+                None
+            }, 
+            tiles::Pos::TopRight, vec);
+            vec = get_capture(piece, board, if auxn > 1 && auxn < 32 {
+                Some(auxn)
+            } else {
+                None
+            }, 
+            tiles::Pos::TopLeft, vec);
         }
     }
     return vec;

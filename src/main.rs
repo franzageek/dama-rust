@@ -13,24 +13,40 @@ fn main() {
             match moves {
                 Some(vec) => {
                     for i in vec {
-                        println!("possible move: {i}");
+                        println!("possible move from 23: {i}");
                     }
                 }
                 _ => { 
                     println!("no move avaliable");
                 }
             }
-            piece::move_to(piece, 19, &mut board);
+            piece::move_to(piece, 20, &mut board);
             moves = piece::possible_moves(piece, &board.tiles);
             match moves {
                 Some(vec) => {
                     for i in vec {
-                        println!("possible move: {i}");
+                        println!("possible move from 20: {i}");
                     }
                 }
                 _ => { 
                     println!("no move avaliable");
                 }
+            }
+            if let Some(piece2) = piece::from_n(12, &mut board.clone()) {
+                moves = piece::possible_moves(piece2, &board.tiles);
+                match moves {
+                    Some(vec) => {
+                        for i in vec {
+                            println!("possible move from 12: {i}");
+                        }
+                    }
+                    _ => { 
+                        println!("no move avaliable");
+                    }
+                }
+                piece::move_to(piece2, 16, &mut board);
+                board.tiles[29] = 0;
+                println!("{:?}", capture::get_possible(&piece2, &mut board, 0, tiles::Pos::None));
             }
         }
         _ => { }

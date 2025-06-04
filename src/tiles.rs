@@ -10,6 +10,18 @@ pub enum Pos {
     TopLeft = 4
 }
 
+impl From<u8> for Pos {
+    fn from(value: u8) -> Self {
+        return match value {
+            1 => { Pos::BottomLeft },
+            2 => { Pos::BottomRight },
+            3 => { Pos::TopRight },
+            4 => { Pos::TopLeft}
+            _ => { Pos::None }
+        };
+    }
+}
+
 #[allow(dead_code)]
 pub enum TileState {
     Free(u8),
