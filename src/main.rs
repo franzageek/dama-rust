@@ -1,6 +1,8 @@
 mod piece;
 mod board;
 mod coord;
+mod tiles;
+mod capture;
 
 fn main() {
     println!("dama rust rewrite, v0.1");
