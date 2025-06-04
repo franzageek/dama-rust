@@ -1,5 +1,6 @@
 use crate::piece::*;
 
+#[derive(Clone)]
 #[allow(dead_code)]
 pub struct Board {
     pub pieces: Vec<Piece>,
