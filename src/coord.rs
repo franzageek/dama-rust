@@ -27,3 +27,15 @@ pub fn xy_from_n(n: u8) -> (u8, u8) {
     };
     return (x, y);
 }
+
+pub fn n_from_xy((x, y): (u8, u8)) -> u8 {
+    if x < 8 && y < 8 {
+        return y * 4 + if y % 2 == 0 {
+            x / 2 + 1
+        } else {
+            (x + 1) /2
+        };
+    } else {
+        return 0;
+    }
+}
