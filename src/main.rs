@@ -21,18 +21,11 @@ fn main() {
         .build(),
         &mut board
     );
-    match piece::from_n(23, &mut board.clone()) {
+    /*match piece::from_n(23, &mut board.clone()) {
         Some(piece) => {
-            let mut moves: Option<Vec<u8>> = piece::possible_moves(piece, &board.tiles);
-            match moves {
-                Some(vec) => {
-                    for i in vec {
-                        println!("possible move from 23: {i}");
-                    }
-                }
-                _ => { 
-                    println!("no move avaliable");
-                }
+            let mut moves: Vec<u8> = piece::possible_moves(piece, &board.tiles);
+            for i in moves {
+                println!("possible move from 23: {i}");
             }
             piece::move_to(piece, 20, &mut board);
             moves = piece::possible_moves(piece, &board.tiles);
@@ -64,7 +57,7 @@ fn main() {
             }
         }
         _ => { }
-    }
+    }*/
     
     println!("Thanks for playing dama ;)");
 }
