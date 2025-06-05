@@ -28,7 +28,7 @@ pub fn draw_pieces(d: &mut RaylibDrawHandle, board: &mut board::Board) {
             d.draw_circle(
                 (x as u16 * TILE_SIZE  + TILE_SIZE  / 2) as i32, 
                 (y as u16 * TILE_SIZE + TILE_SIZE  / 2) as i32, 
-                ((TILE_SIZE - 6) / 2) as f32, 
+                ((TILE_SIZE - 10) / 2) as f32, 
             if piece.player {
                     Color::WHITE
                 } else {
@@ -37,15 +37,16 @@ pub fn draw_pieces(d: &mut RaylibDrawHandle, board: &mut board::Board) {
             );
             if piece.king {
                 d.draw_circle(
-                    (x * TILE_SIZE as u8 + TILE_SIZE as u8 / 2) as i32, 
-                    (y * TILE_SIZE as u8 + TILE_SIZE as u8 / 2) as i32, 
-                    ((TILE_SIZE - 16) / 2) as f32, 
-                    Color::DARKGRAY
+                    (x as u16 * TILE_SIZE + TILE_SIZE / 2) as i32, 
+                    (y as u16 * TILE_SIZE + TILE_SIZE / 2) as i32, 
+                    ((TILE_SIZE - 30) / 2) as f32, 
+                    raylib::color::rcolor(0x7b,0x7b,0x7b, 255)
+
                 );
                 d.draw_circle(
-                    (x * TILE_SIZE as u8 + TILE_SIZE as u8 / 2) as i32, 
-                    (y * TILE_SIZE as u8 + TILE_SIZE as u8 / 2) as i32, 
-                    ((TILE_SIZE - 26) / 2) as f32, 
+                    (x as u16 * TILE_SIZE + TILE_SIZE / 2) as i32, 
+                    (y as u16 * TILE_SIZE + TILE_SIZE / 2) as i32, 
+                    ((TILE_SIZE - 50) / 2) as f32, 
                     if piece.player {
                         Color::WHITE
                     } else {

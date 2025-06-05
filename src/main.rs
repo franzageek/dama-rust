@@ -11,6 +11,7 @@ use raylib;
 fn main() {
     println!("dama rust rewrite, v0.1");
     let mut board: board::Board = board::Board::init();
+    board.pieces[14].king = true;
     game::main_loop(
         raylib::init()
         .size(
