@@ -36,8 +36,8 @@ impl Piece {
     }
 }
 
-pub fn possible_moves(piece: &Piece, tiles: &Vec<u8>) -> Option<Vec<u8>> {
-    let mut vec = Vec::new();
+pub fn possible_moves(piece: &Piece, tiles: &Vec<u8>) -> Vec<u8> {
+    let mut vec = Vec::with_capacity(0);
     if !piece.king {
         if piece.player {
             match get_next(Pos::BottomLeft, piece.n, tiles) {
@@ -92,25 +92,22 @@ pub fn possible_moves(piece: &Piece, tiles: &Vec<u8>) -> Option<Vec<u8>> {
             _ => {}
         } 
     }
-    return if vec.len() > 0 {
-        Some(vec)
-    } else {
-        None
-    };
+    return vec;
 }
 
-pub fn move_to(piece: &mut Piece, n: u8, board: &mut Board) {
-    let index: u8 = board.tiles[(piece.n-1) as usize];
-    board.tiles[(n-1) as usize] = index;
-    board.tiles[(piece.n-1) as usize] = 0;
-    piece.n = n;
+pub fn move_to(nfrom: u8, nto: u8, board: &mut Board) {
+    let index: u8 = board.tiles[(nfrom-1) as usize];
+    board.tiles[(nto-1) as usize] = index;
+    board.tiles[(nfrom-1) as usize] = 0;
+    board.pieces[(index-1) as usize].n = nto;
     return;
 }
 
 pub fn from_n(n: u8, board: &mut Board) -> Option<&mut Piece> {
-    return if n > 0 && n <= 32 {
+    return if n > 0 && n <= 32 && board.tiles[(n-1) as usize] != 0 {
         Some(&mut board.pieces[(board.tiles[(n-1) as usize]-1) as usize])
     } else {
+        println!("error: not a valid piece");
         None
     };
 }
