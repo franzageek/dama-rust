@@ -5,6 +5,21 @@ use crate::{board, coord, piece};
 pub const WINDOW_SIZE: u16 = 640;
 pub const TILE_SIZE: u16 = WINDOW_SIZE / 8;
 
+pub fn draw_hints(d: &mut RaylibDrawHandle, piece: Option<&mut piece::Piece>, tiles: &Vec<u8>) {
+    if let Some(piece2) = piece {
+        let vec: Vec<u8> = piece::possible_moves(piece2, tiles);
+        for i in vec {
+            let (x, y) = coord::xy_from_n(i);
+            d.draw_circle(
+                (x as u16 * TILE_SIZE  + TILE_SIZE  / 2) as i32, 
+                (y as u16 * TILE_SIZE + TILE_SIZE  / 2) as i32, 
+                ((TILE_SIZE - 10) / 2) as f32,
+                color::rcolor(0xff, 0xff, 0, 0x5f)
+            );
+        }
+    }
+}
+
 pub fn draw_board(d: &mut RaylibDrawHandle) {
     for row in 0..8 {
         for col in 0..8 {
@@ -20,7 +35,7 @@ pub fn draw_board(d: &mut RaylibDrawHandle) {
     }
 }
 
-pub fn draw_pieces(d: &mut RaylibDrawHandle, board: &mut board::Board) {
+pub fn draw_pieces(d:& mut RaylibDrawHandle, board: &mut board::Board) {
     for i in 0u8..32u8 {
         if board.tiles[i as usize] > 0 && board.tiles[i as usize] < 32 {
             let (x, y) = coord::xy_from_n(i+1);
