@@ -17,7 +17,7 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                     let thisn: u8 = coord::n_from_xy((col as u8, row as u8));
                     println!("thisn:{thisn}");
                     if nfrom == 0 {
-                        if board.tiles[(thisn-1) as usize] != 0 {
+                        if board.tiles[(thisn - 1) as usize] != 0 {
                             if let Some(piece) = piece::from_n(thisn, board) {
                                 if piece.player == board.state {
                                     nfrom = thisn;
@@ -32,13 +32,16 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                     } else {
                         if nfrom != thisn {
                             println!("mark tile at [x={col}|y={row}|n={thisn}] as destination");
-                            if let Some(piece) = piece::from_n(nfrom, &mut board.clone()) { // `piece` is a clone of a piece
-                                let vec: Vec<u8> = piece::possible_moves(piece, &board.tiles.clone());
+                            if let Some(piece) = piece::from_n(nfrom, &mut board.clone()) {
+                                // `piece` is a clone of a piece
+                                let vec: Vec<u8> =
+                                    piece::possible_moves(piece, &board.tiles.clone());
                                 println!("possible moves: {:?}", vec);
                                 if vec.contains(&thisn) {
                                     piece::move_to(piece.n, thisn, board); // used here for `piece.n`
                                     println!("piece was moved successfully");
-                                    if let Some(piece2) = piece::from_n(thisn, board) { // here we get the actual piece
+                                    if let Some(piece2) = piece::from_n(thisn, board) {
+                                        // here we get the actual piece
                                         if piece2.n != thisn {
                                             println!("[E] cannot move piece: illegal move")
                                         } else {
@@ -60,26 +63,24 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                 }
             }
         }
-        let mut rldh: core::drawing::RaylibDrawHandle =  handle.begin_drawing(&thread);
-        rldh.clear_background(color::rcolor(0xFF, 0xFF, 0xFF, 0xFF));ui::draw_board(&mut rldh);
+        let mut rldh: core::drawing::RaylibDrawHandle = handle.begin_drawing(&thread);
+        rldh.clear_background(raylib::color::rcolor(0xDF, 0xDF, 0xDF, 0xFF));
+        ui::draw_board(&mut rldh);
         ui::draw_pieces(&mut rldh, board);
         let capture_available: bool = ui::draw_capture_hints(
-            &mut rldh, 
+            &mut rldh,
             &capture::get_possible(
-                piece::from_n(
-                    nfrom, 
-                    &mut board.clone()
-                ),
-                board, 
+                piece::from_n(nfrom, &mut board.clone()),
+                board,
                 0,
-                tiles::Pos::None
+                tiles::Pos::None,
             ),
         );
         ui::draw_hints(
-            &mut rldh, 
+            &mut rldh,
             piece::from_n(nfrom, &mut board.clone()),
-            &board.tiles, 
-            capture_available
+            &board.tiles,
+            capture_available,
         );
         rldh.draw_text("test", 12, 10, 20, color::rcolor(0xFF, 0x7f, 0, 0xFF));
     }
