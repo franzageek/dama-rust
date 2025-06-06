@@ -7,17 +7,17 @@ pub enum Pos {
     BottomLeft = 1,
     BottomRight = 2,
     TopRight = 3,
-    TopLeft = 4
+    TopLeft = 4,
 }
 
 impl From<u8> for Pos {
     fn from(value: u8) -> Self {
         return match value {
-            1 => { Pos::BottomLeft },
-            2 => { Pos::BottomRight },
-            3 => { Pos::TopRight },
-            4 => { Pos::TopLeft}
-            _ => { Pos::None }
+            1 => Pos::BottomLeft,
+            2 => Pos::BottomRight,
+            3 => Pos::TopRight,
+            4 => Pos::TopLeft,
+            _ => Pos::None,
         };
     }
 }
@@ -26,55 +26,47 @@ impl From<u8> for Pos {
 pub enum TileState {
     Free(u8),
     Busy(u8),
-    OutOfRange
+    OutOfRange,
 }
 
 pub fn get_next(pos: Pos, n: u8, tiles: &Vec<u8>) -> TileState {
-    let (_, y): (u8, u8) =  coord::xy_from_n(n);
+    let (_, y): (u8, u8) = coord::xy_from_n(n);
     let next: u8;
     match pos {
-        Pos::None => { 
-            next = 0; 
+        Pos::None => {
+            next = 0;
         }
         Pos::BottomLeft => {
             next = if n != 1 && n != 9 && n != 17 && n != 25 {
-                n + if y % 2 == 0 { 
-                    3 
-                } else {
-                    4
-                }
+                n + if y % 2 == 0 { 3 } else { 4 }
             } else {
                 0
             };
         }
         Pos::BottomRight => {
-            next =  if n != 8 && n != 16 && n != 24 && n != 32 {
-                n + if y % 2 == 0 {
-                    4
-                } else {
-                    5
-                }
+            next = if n != 8 && n != 16 && n != 24 && n != 32 {
+                n + if y % 2 == 0 { 4 } else { 5 }
             } else {
                 0
             };
         }
         Pos::TopRight => {
-            next = if n != 8 && n != 16 && n != 24 && n != 32 {
-                n - if y % 2 == 0 { 
-                    4 
+            next = if y != 0 {
+                if n != 8 && n != 16 && n != 24 && n != 32 {
+                    n - if y % 2 == 0 { 4 } else { 3 }
                 } else {
-                    3
+                    0
                 }
             } else {
                 0
             };
         }
         Pos::TopLeft => {
-            next = if n != 1 && n != 9 && n != 17 && n != 25 {
-                n - if y % 2 == 0 { 
-                    5
+            next = if y != 0 {
+                if n != 1 && n != 9 && n != 17 && n != 25 {
+                    n - if y % 2 == 0 { 5 } else { 4 }
                 } else {
-                    4
+                    0
                 }
             } else {
                 0
@@ -82,7 +74,7 @@ pub fn get_next(pos: Pos, n: u8, tiles: &Vec<u8>) -> TileState {
         }
     }
     if next > 0 && next < 32 {
-        if tiles[(next-1) as usize] == 0 {
+        if tiles[(next - 1) as usize] == 0 {
             return TileState::Free(next);
         } else {
             return TileState::Busy(next);
