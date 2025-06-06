@@ -107,7 +107,7 @@ pub fn from_n(n: u8, board: &mut Board) -> Option<&mut Piece> {
     return if n > 0 && n <= 32 && board.tiles[(n-1) as usize] != 0 {
         Some(&mut board.pieces[(board.tiles[(n-1) as usize]-1) as usize])
     } else {
-        println!("error: not a valid piece");
+        //println!("error: not a valid piece");
         None
     };
 }

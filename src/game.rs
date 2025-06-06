@@ -1,6 +1,6 @@
 use raylib::{prelude::RaylibDraw, *};
 
-use crate::{board, coord, piece, ui};
+use crate::{board, capture, coord, piece, tiles, ui};
 
 pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut board::Board) {
     let mut nfrom: u8 = 0;
@@ -63,10 +63,23 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
         let mut rldh: core::drawing::RaylibDrawHandle =  handle.begin_drawing(&thread);
         rldh.clear_background(color::rcolor(0xFF, 0xFF, 0xFF, 0xFF));ui::draw_board(&mut rldh);
         ui::draw_pieces(&mut rldh, board);
+        let capture_available: bool = ui::draw_capture_hints(
+            &mut rldh, 
+            &capture::get_possible(
+                piece::from_n(
+                    nfrom, 
+                    &mut board.clone()
+                ),
+                board, 
+                0,
+                tiles::Pos::None
+            ),
+        );
         ui::draw_hints(
             &mut rldh, 
             piece::from_n(nfrom, &mut board.clone()),
-            &board.tiles
+            &board.tiles, 
+            capture_available
         );
         rldh.draw_text("test", 12, 10, 20, color::rcolor(0xFF, 0x7f, 0, 0xFF));
     }
