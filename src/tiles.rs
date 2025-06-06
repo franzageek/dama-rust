@@ -1,6 +1,5 @@
 use crate::coord;
 
-#[allow(dead_code)]
 #[derive(Clone, Copy)]
 pub enum Pos {
     None = 0,
@@ -22,7 +21,6 @@ impl From<u8> for Pos {
     }
 }
 
-#[allow(dead_code)]
 pub enum TileState {
     Free(u8),
     Busy(u8),

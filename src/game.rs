@@ -34,22 +34,38 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                             println!("mark tile at [x={col}|y={row}|n={thisn}] as destination");
                             if let Some(piece) = piece::from_n(nfrom, &mut board.clone()) {
                                 // `piece` is a clone of a piece
-                                let vec: Vec<u8> =
-                                    piece::possible_moves(piece, &board.tiles.clone());
-                                println!("possible moves: {:?}", vec);
-                                if vec.contains(&thisn) {
-                                    piece::move_to(piece.n, thisn, board); // used here for `piece.n`
-                                    println!("piece was moved successfully");
-                                    if let Some(piece2) = piece::from_n(thisn, board) {
-                                        // here we get the actual piece
-                                        if piece2.n != thisn {
-                                            println!("[E] cannot move piece: illegal move")
-                                        } else {
-                                            board.state = !board.state;
+                                let captures: Vec<capture::Capture> =
+                                    capture::get_possible(Some(piece), board, 0, tiles::Pos::None);
+                                if captures.len() > 0 {
+                                    if capture::rec_contains(thisn, Some(&captures)) {
+                                        capture::eat(nfrom, thisn, board, &captures);
+                                        if let Some(piece2) = piece::from_n(thisn, board) {
+                                            // here we get the actual piece
+                                            if piece2.n != thisn {
+                                                println!("[E] cannot move piece: illegal move")
+                                            } else {
+                                                board.state = !board.state;
+                                            }
                                         }
                                     }
                                 } else {
-                                    println!("[E] cannot move piece: illegal move");
+                                    let vec: Vec<u8> =
+                                        piece::possible_moves(piece, &board.tiles.clone());
+                                    println!("possible moves: {:?}", vec);
+                                    if vec.contains(&thisn) {
+                                        piece::move_to(piece.n, thisn, board); // used here for `piece.n`
+                                        println!("piece was moved successfully");
+                                        if let Some(piece2) = piece::from_n(thisn, board) {
+                                            // here we get the actual piece
+                                            if piece2.n != thisn {
+                                                println!("[E] cannot move piece: illegal move")
+                                            } else {
+                                                board.state = !board.state;
+                                            }
+                                        }
+                                    } else {
+                                        println!("[E] cannot move piece: illegal move");
+                                    }
                                 }
                             }
                         } else {
