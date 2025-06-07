@@ -91,7 +91,10 @@ pub fn draw_board(d: &mut RaylibDrawHandle) {
 
 pub fn draw_pieces(d: &mut RaylibDrawHandle, board: &mut board::Board) {
     for i in 0u8..32u8 {
-        if board.tiles[i as usize] > 0 && board.tiles[i as usize] < 32 {
+        if board.tiles[i as usize] > 0
+            && board.tiles[i as usize] < 32
+            && board.pieces[(board.tiles[i as usize] - 1) as usize].valid
+        {
             let (x, y) = coord::xy_from_n(i + 1);
             let piece: &piece::Piece =
                 piece::from_n(i + 1, board).expect("error: no valid piece found");
