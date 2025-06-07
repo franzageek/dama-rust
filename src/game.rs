@@ -1,6 +1,9 @@
 use raylib::{prelude::RaylibDraw, *};
 
-use crate::{board, capture, coord, piece, tiles, ui};
+use crate::{
+    board, capture, coord, piece, tiles,
+    ui::{self, WINDOW_SIZE},
+};
 
 fn can_become_king(n: u8, board: &mut board::Board) {
     let piece: &mut piece::Piece = &mut board.pieces[(board.tiles[(n - 1) as usize] - 1) as usize];
@@ -93,6 +96,57 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
         rldh.clear_background(raylib::color::rcolor(0xDF, 0xDF, 0xDF, 0xFF));
         ui::draw_board(&mut rldh);
         ui::draw_pieces(&mut rldh, board);
+        match tiles::check_winner(board) {
+            Some(winner) => match winner {
+                true => {
+                    rldh.draw_rectangle(
+                        (WINDOW_SIZE / 2 - 250) as i32,
+                        (WINDOW_SIZE / 2 - 50) as i32,
+                        500,
+                        100,
+                        color::Color::WHITE,
+                    );
+                    rldh.draw_text(
+                        "white player wins!",
+                        (WINDOW_SIZE / 2 - 222) as i32,
+                        (WINDOW_SIZE / 2 - 25) as i32,
+                        50,
+                        color::Color::DODGERBLUE,
+                    );
+                    rldh.draw_text(
+                        "thanks for playing!",
+                        (WINDOW_SIZE / 2 - 95) as i32,
+                        (WINDOW_SIZE / 2 + 25) as i32,
+                        20,
+                        color::Color::DODGERBLUE,
+                    );
+                }
+                false => {
+                    rldh.draw_rectangle(
+                        (WINDOW_SIZE / 2 - 250) as i32,
+                        (WINDOW_SIZE / 2 - 50) as i32,
+                        500,
+                        100,
+                        color::Color::BLACK,
+                    );
+                    rldh.draw_text(
+                        "black player wins!",
+                        (WINDOW_SIZE / 2 - 222) as i32,
+                        (WINDOW_SIZE / 2 - 25) as i32,
+                        50,
+                        color::Color::DODGERBLUE,
+                    );
+                    rldh.draw_text(
+                        "thanks for playing!",
+                        (WINDOW_SIZE / 2 - 95) as i32,
+                        (WINDOW_SIZE / 2 + 25) as i32,
+                        20,
+                        color::Color::DODGERBLUE,
+                    );
+                }
+            },
+            _ => {}
+        }
         let vec: Vec<Box<capture::Capture>> = capture::get_possible(
             piece::from_n(nfrom, &mut board.clone()),
             board,
@@ -112,6 +166,5 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
             &board.tiles,
             capture_available,
         );
-        rldh.draw_text("test", 12, 10, 20, color::rcolor(0xFF, 0x7f, 0, 0xFF));
     }
 }

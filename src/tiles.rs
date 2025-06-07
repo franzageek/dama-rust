@@ -1,3 +1,4 @@
+use crate::board;
 use crate::coord;
 
 #[derive(Clone, Copy)]
@@ -79,5 +80,26 @@ pub fn get_next(pos: Pos, n: u8, tiles: &Vec<u8>) -> TileState {
         }
     } else {
         return TileState::OutOfRange;
+    }
+}
+
+pub fn check_winner(board: &board::Board) -> Option<bool> {
+    let mut can_win: bool = false;
+    let mut winner: bool = false;
+    for i in 0usize..12 {
+        if board.pieces[i].valid {
+            can_win = true;
+            winner = true;
+        }
+    }
+    for i in 12usize..24 {
+        if board.pieces[i].valid {
+            winner = false;
+        }
+    }
+    if winner == can_win {
+        return Some(winner);
+    } else {
+        return None;
     }
 }
