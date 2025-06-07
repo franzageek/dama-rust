@@ -71,7 +71,7 @@ pub fn get_next(pos: Pos, n: u8, tiles: &Vec<u8>) -> TileState {
             };
         }
     }
-    if next > 0 && next < 32 {
+    if next > 0 && next <= 32 {
         if tiles[(next - 1) as usize] == 0 {
             return TileState::Free(next);
         } else {
