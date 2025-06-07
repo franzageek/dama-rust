@@ -35,6 +35,8 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                                 } else {
                                     println!("[E] it's player {} turn!", board.state);
                                 }
+                            } else {
+                                unreachable!("error: could not retrieve piece from board::tiles");
                             }
                         } else {
                             println!("[E] tile at [x={col}|y={row}|n={thisn}] is free");
@@ -73,6 +75,8 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                                         println!("[E] cannot move piece: illegal move");
                                     }
                                 }
+                            } else {
+                                unreachable!("error: could not retrieve piece from board::tiles");
                             }
                         } else {
                             println!("[E] cannot move piece: destination is equal to source");
