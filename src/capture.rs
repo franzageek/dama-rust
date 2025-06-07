@@ -45,6 +45,8 @@ fn get_capture(
                         _ => {}
                     }
                 }
+            } else {
+                unreachable!("error: could not retrieve piece from board::tiles");
             }
         }
         _ => {}
