@@ -2,6 +2,16 @@ use raylib::{prelude::RaylibDraw, *};
 
 use crate::{board, capture, coord, piece, tiles, ui};
 
+fn can_become_king(n: u8, board: &mut board::Board) {
+    let piece: &mut piece::Piece = &mut board.pieces[(board.tiles[(n - 1) as usize] - 1) as usize];
+    if !piece.king {
+        let (_, y) = coord::xy_from_n(piece.n);
+        if (piece.player && y == 7) || (!piece.player && y == 0) {
+            piece.king = true;
+        }
+    }
+}
+
 pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut board::Board) {
     let mut nfrom: u8 = 0;
     while !handle.window_should_close() {
@@ -34,19 +44,21 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                             println!("mark tile at [x={col}|y={row}|n={thisn}] as destination");
                             if let Some(piece) = piece::from_n(nfrom, &mut board.clone()) {
                                 // `piece` is a clone of a piece
-                                let captures: Vec<capture::Capture> =
-                                    capture::get_possible(Some(piece), board, 0, tiles::Pos::None);
+                                let captures: Vec<Box<capture::Capture>> = capture::get_possible(
+                                    Some(piece),
+                                    &mut board.clone(),
+                                    0,
+                                    tiles::Pos::None,
+                                );
                                 if captures.len() > 0 {
-                                    if capture::rec_contains(thisn, Some(&captures)) {
-                                        capture::eat(nfrom, thisn, board, &captures);
-                                        if let Some(piece2) = piece::from_n(thisn, board) {
-                                            // here we get the actual piece
-                                            if piece2.n != thisn {
-                                                println!("[E] cannot move piece: illegal move")
-                                            } else {
-                                                board.state = !board.state;
-                                            }
-                                        }
+                                    if capture::rec_contains(thisn, Some(&captures))
+                                        && capture::eat(nfrom, thisn, board, &captures)
+                                    {
+                                        println!("piece was moved successfully");
+                                        can_become_king(thisn, board);
+                                        board.state = !board.state;
+                                    } else {
+                                        println!("[E] cannot move piece: illegal move");
                                     }
                                 } else {
                                     let vec: Vec<u8> =
@@ -55,14 +67,8 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                                     if vec.contains(&thisn) {
                                         piece::move_to(piece.n, thisn, board); // used here for `piece.n`
                                         println!("piece was moved successfully");
-                                        if let Some(piece2) = piece::from_n(thisn, board) {
-                                            // here we get the actual piece
-                                            if piece2.n != thisn {
-                                                println!("[E] cannot move piece: illegal move")
-                                            } else {
-                                                board.state = !board.state;
-                                            }
-                                        }
+                                        can_become_king(thisn, board);
+                                        board.state = !board.state;
                                     } else {
                                         println!("[E] cannot move piece: illegal move");
                                     }
@@ -83,14 +89,18 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
         rldh.clear_background(raylib::color::rcolor(0xDF, 0xDF, 0xDF, 0xFF));
         ui::draw_board(&mut rldh);
         ui::draw_pieces(&mut rldh, board);
+        let vec: Vec<Box<capture::Capture>> = capture::get_possible(
+            piece::from_n(nfrom, &mut board.clone()),
+            board,
+            0,
+            tiles::Pos::None,
+        );
         let capture_available: bool = ui::draw_capture_hints(
             &mut rldh,
-            &capture::get_possible(
-                piece::from_n(nfrom, &mut board.clone()),
-                board,
-                0,
-                tiles::Pos::None,
-            ),
+            &vec,
+            0,
+            capture::get_max_capture_depth(None, 0, &vec),
+            None,
         );
         ui::draw_hints(
             &mut rldh,

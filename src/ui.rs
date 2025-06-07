@@ -5,26 +5,43 @@ use crate::{board, capture, coord, piece};
 pub const WINDOW_SIZE: u16 = 640;
 pub const TILE_SIZE: u16 = WINDOW_SIZE / 8;
 
-pub fn draw_capture_hints(d: &mut RaylibDrawHandle, vec: &Vec<capture::Capture>) -> bool {
-    for i in vec {
-        let (mut x, mut y) = coord::xy_from_n(i.ndest);
-        d.draw_circle(
-            (x as u16 * TILE_SIZE + TILE_SIZE / 2) as i32,
-            (y as u16 * TILE_SIZE + TILE_SIZE / 2) as i32,
-            ((TILE_SIZE - 10) / 2) as f32,
-            color::rcolor(0xFF, 0xFF, 0, 0x5F),
-        );
-        if i.next.len() > 0 {
-            draw_capture_hints(d, &i.next);
+pub fn draw_capture_hints(
+    d: &mut RaylibDrawHandle,
+    vec: &Vec<Box<capture::Capture>>,
+    level: u8,
+    max_depth: u8,
+    reached: Option<&mut bool>,
+) -> bool {
+    if let Some(done) = reached {
+        for i in vec {
+            if i.next.len() > 0 {
+                draw_capture_hints(d, &i.next, level + 1, max_depth, Some(done));
+            }
+            if (level == max_depth) || *done {
+                let (mut x, mut y) = coord::xy_from_n(i.ndest);
+                d.draw_circle(
+                    (x as u16 * TILE_SIZE + TILE_SIZE / 2) as i32,
+                    (y as u16 * TILE_SIZE + TILE_SIZE / 2) as i32,
+                    ((TILE_SIZE - 10) / 2) as f32,
+                    color::rcolor(0xFF, 0xFF, 0, 0x5F),
+                );
+                (x, y) = coord::xy_from_n(i.ncapture);
+                d.draw_rectangle(
+                    (x as u16 * TILE_SIZE) as i32,
+                    (y as u16 * TILE_SIZE) as i32,
+                    TILE_SIZE as i32,
+                    TILE_SIZE as i32,
+                    color::rcolor(0xFF, 0x6F, 0, 0x5F),
+                );
+                *done = true;
+            }
+            if level == 0 {
+                *done = false;
+            }
         }
-        (x, y) = coord::xy_from_n(i.ncapture);
-        d.draw_rectangle(
-            (x as u16 * TILE_SIZE) as i32,
-            (y as u16 * TILE_SIZE) as i32,
-            TILE_SIZE as i32,
-            TILE_SIZE as i32,
-            color::rcolor(0xFF, 0x6F, 0, 0x5F),
-        );
+    } else {
+        let mut done: bool = false;
+        draw_capture_hints(d, vec, level, max_depth, Some(&mut done));
     }
     return vec.len() > 0;
 }
