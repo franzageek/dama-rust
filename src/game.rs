@@ -25,28 +25,34 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
             let row = (mouse_pos.y as i32) / ui::TILE_SIZE as i32;
 
             if row >= 0 && row < 8 && col >= 0 && col < 8 {
-                println!("click[x={}, y={}]", col, row);
+                //println!("click[x={}, y={}]", col, row);
                 if (row % 2 == 0) == (col % 2 == 0) {
                     let thisn: u8 = coord::n_from_xy((col as u8, row as u8));
-                    println!("thisn:{thisn}");
+                    //println!("thisn:{thisn}");
                     if nfrom == 0 {
                         if board.tiles[(thisn - 1) as usize] != 0 {
                             if let Some(piece) = piece::from_n(thisn, board) {
                                 if piece.player == board.state {
                                     nfrom = thisn;
-                                    println!("selected piece at [x={col}|y={row}|n={thisn}]");
+                                    //println!("selected piece at [x={col}|y={row}|n={thisn}]");
                                 } else {
-                                    println!("[E] it's player {} turn!", board.state);
+                                    println!("[E] it's player [{}]'s turn!", 
+                                        if board.state {
+                                            "white"
+                                        } else {
+                                            "black"
+                                        }
+                                    );
                                 }
                             } else {
                                 unreachable!("error: could not retrieve piece from board::tiles");
                             }
                         } else {
-                            println!("[E] tile at [x={col}|y={row}|n={thisn}] is free");
+                            println!("[E] tile at [ x = {col} | y = {row} | n = {thisn} ] is free");
                         }
                     } else {
                         if nfrom != thisn {
-                            println!("mark tile at [x={col}|y={row}|n={thisn}] as destination");
+                            //println!("mark tile at [x={col}|y={row}|n={thisn}] as destination");
                             if let Some(piece) = piece::from_n(nfrom, &mut board.clone()) {
                                 // `piece` is a clone of a piece
                                 let captures: Vec<Box<capture::Capture>> = capture::get_possible(
@@ -59,7 +65,7 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                                     if capture::rec_contains(thisn, Some(&captures))
                                         && capture::eat(nfrom, thisn, board, &captures)
                                     {
-                                        println!("piece was moved successfully");
+                                        //println!("piece was moved successfully");
                                         can_become_king(thisn, board);
                                         board.state = !board.state;
                                     } else {
@@ -68,10 +74,10 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                                 } else {
                                     let vec: Vec<u8> =
                                         piece::possible_moves(piece, &board.tiles.clone());
-                                    println!("possible moves: {:?}", vec);
+                                    //println!("possible moves: {:?}", vec);
                                     if vec.contains(&thisn) {
                                         piece::move_to(piece.n, thisn, board); // used here for `piece.n`
-                                        println!("piece was moved successfully");
+                                        //println!("piece was moved successfully");
                                         can_become_king(thisn, board);
                                         board.state = !board.state;
                                     } else {
@@ -81,9 +87,9 @@ pub fn main_loop((mut handle, thread): (RaylibHandle, RaylibThread), board: &mut
                             } else {
                                 unreachable!("error: could not retrieve piece from board::tiles");
                             }
-                        } else {
+                        }/* else {
                             println!("[E] cannot move piece: destination is equal to source");
-                        }
+                        }*/
                         nfrom = 0;
                     }
                 } else {
